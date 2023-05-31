@@ -22,7 +22,7 @@ import http.client
 import json
 
 
-import urllib3
+
 import requests
 from datetime import datetime
 from openhim_mediator_utils.main import Main
