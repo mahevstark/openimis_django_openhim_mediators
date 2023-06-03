@@ -34,22 +34,22 @@ spec:
             requests:
               memory: "312Mi"
               cpu: 250m
-          livenessProbe:
-            failureThreshold: 3
-            initialDelaySeconds: 120
-            periodSeconds: 30
-            successThreshold: 1
-            tcpSocket:
-              port: 8000
-            timeoutSeconds: 30
-          readinessProbe:
-            failureThreshold: 3
-            initialDelaySeconds: 90
-            periodSeconds: 30
-            successThreshold: 1
-            tcpSocket:
-              port: 8000
-            timeoutSeconds: 30
+          # livenessProbe:
+          #   failureThreshold: 3
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 30
+          #   successThreshold: 1
+          #   tcpSocket:
+          #     port: 8000
+          #   timeoutSeconds: 30
+          # readinessProbe:
+          #   failureThreshold: 3
+          #   initialDelaySeconds: 90
+          #   periodSeconds: 30
+          #   successThreshold: 1
+          #   tcpSocket:
+          #     port: 8000
+          #   timeoutSeconds: 30
           imagePullPolicy: Always
           # restartPullPolicy: Never
 
