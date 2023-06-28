@@ -11,13 +11,11 @@ RUN pip install -r /requirements.txt
 
 COPY ./mediators /mediators
 
-COPY ./create_superuser.py /mediators/create_superuser.py
-
-COPY ./entrypoint.sh /mediators/entrypoint.sh
-
 WORKDIR /mediators
 
 RUN python manage.py makemigrations
 RUN python manage.py migrate
 
-CMD ["/bin/sh", "entrypoint.sh"]
+CMD python manage.py runserver 0.0.0.0:8000
+
+#docker run --env-file .env -p 8000:8000 openimis-mediator:latest
