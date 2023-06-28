@@ -22,9 +22,9 @@ spec:
           image: <IMAGE>
           ports:
             - containerPort: 8000
-          # envFrom:
-          #   - secretRef:
-          #       name: suresalama-secret
+          envFrom:
+            - secretRef:
+                name: mediator-secret
           #   - configMapRef:
           #       name: suresalama-configmap
           resources:
