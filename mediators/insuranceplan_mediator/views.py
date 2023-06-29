@@ -42,9 +42,9 @@ requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
 @api_view(['GET', 'POST'])
-def getContract(request):
+def getInsurancePlan(request):
 
-    print("========Executing getContract method========")
+    print("========Executing getInsurancePlan method========")
 
     result = configview()
     configurations = result.__dict__
@@ -57,7 +57,7 @@ def getContract(request):
     auth_openimis = "Basic " + encodedStr
 
     url = configurations["data"]["openimis_url"]+getPortPart(
-        configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Contract"
+        configurations["data"]["openimis_port"])+"/api/api_fhir_r4/InsurancePlan"
 
     # url = configurations["data"]["openimis_url"]+":" + \
     #     str(configurations["data"]["openimis_port"]) + \
@@ -114,7 +114,7 @@ def getContract(request):
         return Response(datac)
 
 
-def registerContractMediator():
+def registerInsurancePlanMediator():
     result = configview()
     configurations = result.__dict__
 
@@ -134,20 +134,20 @@ def registerContractMediator():
     }
 
     conf = {
-        "urn": "urn:mediator:python_fhir_r4_Contract_mediator",
+        "urn": "urn:mediator:python_fhir_r4_InsurancePlan_mediator",
         "version": "1.0.1",
-        "name": "Python Fhir R4 Contract Mediator",
-        "description": "Python Fhir R4 Contract Mediator",
+        "name": "Python Fhir R4 InsurancePlan Mediator",
+        "description": "Python Fhir R4 InsurancePlan Mediator",
 
         "defaultChannelConfig": [
             {
-                "name": "Python Fhir R4 Contract Mediator",
-                "urlPattern": "^/api/api_fhir_r4/Contract$",
+                "name": "Python Fhir R4 InsurancePlan Mediator",
+                "urlPattern": "^/api/api_fhir_r4/InsurancePlan$",
                 "routes": [
                         {
-                            "name": "Python Fhir R4 Contract Mediator Route",
+                            "name": "Python Fhir R4 InsurancePlan Mediator Route",
                             "host": configurations["data"]["mediator_url"],
-                            "path": "/api/api_fhir_r4/Contract",
+                            "path": "/api/api_fhir_r4/InsurancePlan",
                                     "port": configurations["data"]["mediator_port"],
                                     "primary": True,
                                     "type": "http"
@@ -163,7 +163,7 @@ def registerContractMediator():
             {
                 "name": "Bootstrap Scaffold Mediator Endpoint",
                 "host": configurations["data"]["mediator_url"],
-                "path": "/api/api_fhir_r4/Contract",
+                "path": "/api/api_fhir_r4/InsurancePlan",
                 "port": configurations["data"]["mediator_port"],
                 "primary": True,
                 "type": "http"

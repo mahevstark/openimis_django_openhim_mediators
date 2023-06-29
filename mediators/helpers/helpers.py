@@ -21,7 +21,7 @@ def getPortPart(p):
     return ":"+str(p)
 
 
-def formatTransactionPayload(datac, callback=None, dataToAdded={}):
+def formatTransactionPayload(datac, callback=None, data_to_update={}):
     print('=========Executing formatTransactionPayload========= ')
 
     request_dict = {"request": {"method": "POST"}}
@@ -31,7 +31,7 @@ def formatTransactionPayload(datac, callback=None, dataToAdded={}):
     for i in range(len(datac["entry"])):
         datac["entry"][i].update(request_dict)
         if (callback != None):
-            callback(dataToAdded)
+            callback(datac["entry"][i], data_to_update)
             #   datac["entry"][i]["resource"].update(org)
 
     payload = json.dumps(datac)
@@ -52,11 +52,10 @@ def postToSuresalamaChannel(url, payload):
 
 
 # Ping required Channel
-def pinChannel(channelUrl, resource=''):
+def pingChannel(channelUrl, resource='', querystring={"": ""}):
     print(
         f'=====Send Request to OpenHIM channel to Migrate {resource} resource=====')
 
-    querystring = {"": ""}
     payload = ""
     headers = {"": ""}
 
@@ -71,8 +70,6 @@ def pinChannel(channelUrl, resource=''):
 def getPaginatedRecords(datac, url, payload, headers):
     try:
         entries = datac["entry"]
-
-        # print(entries)
 
         total = datac['total']
 

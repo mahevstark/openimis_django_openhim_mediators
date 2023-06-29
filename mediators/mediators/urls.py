@@ -21,10 +21,12 @@ from claim_mediator.views import getClaims
 from coverage_mediator.views import getCoverage
 from organisation_mediator.views import getOrganisation
 from group_mediator.views import getGroup
-from patient_mediator.views import getPatient, savePrefs, savePreference
+from patient_mediator.views import getPatient, savePreference
 from contract_mediator.views import getContract
 from claimresponse_mediator.views import getClaimResponse
 from coverageeligibilityrequest_mediator.views import getCoverageEligibilityRequest
+from insuranceplan_mediator.views import getInsurancePlan
+
 
 from coverage_mediator.views import registerCoverageMediator
 from claim_mediator.views import registerClaimsMediator
@@ -34,6 +36,7 @@ from patient_mediator.views import registerPatientMediator
 from contract_mediator.views import registerContractMediator
 from claimresponse_mediator.views import registerClaimResponseMediator
 from coverageeligibilityrequest_mediator.views import registerCoverageEligibilityRequestMediator
+from insuranceplan_mediator.views import registerInsurancePlanMediator
 
 
 urlpatterns = [
@@ -44,14 +47,16 @@ urlpatterns = [
     path('api/api_fhir_r4/Patient', getPatient),
     path('api/api_fhir_r4/Group', getGroup),
     path('api/api_fhir_r4/Contract', getContract),
+    path('api/api_fhir_r4/InsurancePlan', getInsurancePlan),
     path('api/api_fhir_r4/ClaimResponse', getClaimResponse),
-    path("api/api_fhir_r4/savePrefs", savePrefs),
+    # path("api/api_fhir_r4/savePrefs", savePrefs),
     path("api/api_fhir_r4/savePreference", savePreference),
-    path('api/api_fhir_r4/CoverageEligibilityRequest', getCoverageEligibilityRequest),
+    path('api/api_fhir_r4/CoverageEligibilityRequest',
+         getCoverageEligibilityRequest),
 
 ]
 
-#register Mediators - once -- uncomment after setting up variables
+# register Mediators - once -- uncomment after setting up variables
 
 
 # registerClaimsMediator()
@@ -62,3 +67,4 @@ urlpatterns = [
 # registerContractMediator()
 # registerClaimResponseMediator()
 # registerCoverageEligibilityRequestMediator()
+# registerInsurancePlanMediator
