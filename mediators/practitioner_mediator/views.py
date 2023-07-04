@@ -192,12 +192,3 @@ def registerPractitionerMediator():
 # Morning the health status of the client on the console
 def checkHeartbeat(openhim_mediator_utils):
     openhim_mediator_utils.activate_heartbeat()
-
-
-# 1. Deploy and automate V2 backend
-
-# 2. Extend OpenIMIS mediators to handle other FHIR resources (Group, Location, Claim, ClaimResponse,  Coverage). Currently, we have the following FHIR resources migrated sucessfully: InsurancePlan, Contract (policy),  Insuree (Patient), and Organization,)
-
-# 3. Collaborate with team members to resolve Issues with OpenHIM deployment
-
-# 4. Integrate subscription FHIR resource on OpenIMIS  to hand two-way syncing of data across OpenIMIS system and Lafia FHIR Server
