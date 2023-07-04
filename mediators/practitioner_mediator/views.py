@@ -44,9 +44,9 @@ from helpers.helpers import requests, formatTransactionPayload, postToSuresalama
 # requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 @api_view(['GET', 'POST'])
-def getGroup(request):
+def getPractitioner(request):
     try:
-        print(" Executing getGroup ........")
+        print(" Executing getPractitioner ........")
 
         # get url params
         page_offset = request.GET.get("page-offset", "")
@@ -66,7 +66,7 @@ def getGroup(request):
 
         # Standard Base64 Encoding
         url = configurations["data"]["openimis_url"]+getPortPart(
-            configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Group"
+            configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Practitioner"
 
         # retur`n url
 
@@ -123,7 +123,7 @@ def getGroup(request):
         # return Response({"status": "errror", "message": str(e)})
 
 
-def registerGroupMediator():
+def registerPractitionerMediator():
     result = configview()
     configurations = result.__dict__
 
@@ -143,20 +143,20 @@ def registerGroupMediator():
     }
 
     conf = {
-        "urn": "urn:mediator:python_fhir_r4_Group_mediator",
+        "urn": "urn:mediator:python_fhir_r4_Practitioner_mediator",
         "version": "1.0.1",
-        "name": "Python Fhir R4 Group Mediator",
-        "description": "Python Fhir R4 Group Mediator",
+        "name": "Python Fhir R4 Practitioner Mediator",
+        "description": "Python Fhir R4 Practitioner Mediator",
 
         "defaultChannelConfig": [
             {
-                "name": "Python Fhir R4 Group Mediator",
-                "urlPattern": "^/api/api_fhir_r4/Group$",
+                "name": "Python Fhir R4 Practitioner Mediator",
+                "urlPattern": "^/api/api_fhir_r4/Practitioner$",
                 "routes": [
                         {
-                            "name": "Python Fhir R4 Group Mediator Route",
+                            "name": "Python Fhir R4 Practitioner Mediator Route",
                             "host": configurations["data"]["mediator_url"],
-                            "path": "/api/api_fhir_r4/Group",
+                            "path": "/api/api_fhir_r4/Practitioner",
                                     "port": configurations["data"]["mediator_port"],
                                     "primary": True,
                                     "type": "http"
@@ -172,7 +172,7 @@ def registerGroupMediator():
             {
                 "name": "Bootstrap Scaffold Mediator Endpoint",
                 "host": configurations["data"]["mediator_url"],
-                "path": "/api/api_fhir_r4/Group",
+                "path": "/api/api_fhir_r4/Practitioner",
                 "port": configurations["data"]["mediator_port"],
                 "primary": True,
                 "type": "http"

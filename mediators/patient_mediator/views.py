@@ -92,7 +92,7 @@ def getPatient(request):
 
             # Pass any subsequent data updates as callback parameters
 
-            # Here we intend to patient records retrieved to reflect organization Id
+            # Here we intend update to patient records retrieved to reflect organization Id
 
             def update_patient_org(
                 data, org): return data['resource'].update(org)
@@ -196,6 +196,13 @@ def savePreference(request):
             url = open_him_url+'/openimis/organization'
             # Send request to OpenHIM channel
             pingChannel(url, 'Organization')
+
+        if 'practitioner' in resources:
+            print('=====About to fetch and migrate practitioner=====')
+
+            url = open_him_url+'/openimis/practitioner'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'Practitioner')
 
     # USERNAME = configurations["data"]["openhim_user"]
     # PASSWORD = configurations["data"]["openhim_passkey"]
@@ -542,3 +549,12 @@ def registerPatientMediator():
 # Morning the health status of the client on the console
 def checkHeartbeat(openhim_mediator_utils):
     openhim_mediator_utils.activate_heartbeat()
+
+
+# 1. Deploy and automate V2 backend
+
+# 2. Extend OpenIMIS mediators to handle other FHIR resources (Group, Location, Claim, ClaimResponse,  Coverage). Currently, we have the following FHIR resources migrated sucessfully: InsurancePlan, Contract (policy),  Insuree (Patient), and Organization,)
+
+# 3. Collaborate with team members to resolve Issues with OpenHIM deployment
+
+# 4. Integrate subscription FHIR resource on OpenIMIS  to hand two-way syncing of data across OpenIMIS system and Lafia FHIR Server
