@@ -168,21 +168,21 @@ def savePreference(request):
         print(resources)
 
         if 'insuranceProduct' in resources:
-            print('=====About to fetch and migrate insurance products=====')
+            print('=====About to fetch and migrate insurance products resource=====')
 
             url = open_him_url+'/openimis/product'
             # Send request to OpenHIM channel
             pingChannel(url, 'Insurance Product')
 
         if 'policy' in resources:
-            print('=====About to fetch and migrate policy=====')
+            print('=====About to fetch and migrate policy resource=====')
 
             url = open_him_url+'/openimis/policy'
             # Send request to OpenHIM channel
             pingChannel(url, 'Policy')
 
         if 'insuree' in resources:
-            print('=====About to fetch and migrate insuree=====')
+            print('=====About to fetch and migrate insuree resource=====')
 
             querystring = {"orgId": payload["orgId"] or ""}
 
@@ -191,18 +191,60 @@ def savePreference(request):
             pingChannel(url, 'Insuree', querystring)
 
         if 'organization' in resources:
-            print('=====About to fetch and migrate insuree=====')
+            print('=====About to fetch and migrate organization resource=====')
 
             url = open_him_url+'/openimis/organization'
             # Send request to OpenHIM channel
             pingChannel(url, 'Organization')
 
         if 'practitioner' in resources:
-            print('=====About to fetch and migrate practitioner=====')
+            print('=====About to fetch and migrate practitioner resource=====')
 
             url = open_him_url+'/openimis/practitioner'
             # Send request to OpenHIM channel
             pingChannel(url, 'Practitioner')
+
+        if 'group' in resources:
+            print('=====About to fetch and migrate group resource=====')
+
+            url = open_him_url+'/openimis/group'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'Group')
+
+        if 'location' in resources:
+            print('=====About to fetch and migrate locationn resource=====')
+
+            url = open_him_url+'/openimis/location'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'Location')
+
+        if 'claim' in resources:
+            print('=====About to fetch and migrate claim resource=====')
+
+            url = open_him_url+'/openimis/claim'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'Claim')
+
+        if 'claimResponse' in resources:
+            print('=====About to fetch and migrate claimResponse resource=====')
+
+            url = open_him_url+'/openimis/claimResponse'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'ClaimResponse')
+
+        if 'coverage' in resources:
+            print('=====About to fetch and migrate coverage resource=====')
+
+            url = open_him_url+'/openimis/coverage'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'Coverage')
+
+        if 'coverageEligibility' in resources:
+            print('=====About to fetch and migrate coverageEligibility resource=====')
+
+            url = open_him_url+'/openimis/coverageEligibility'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'CoverageEligibility')
 
     # USERNAME = configurations["data"]["openhim_user"]
     # PASSWORD = configurations["data"]["openhim_passkey"]
