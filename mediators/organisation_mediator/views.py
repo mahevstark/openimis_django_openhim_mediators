@@ -58,9 +58,6 @@ def getOrganisation(request):
     url = configurations["data"]["openimis_url"]+getPortPart(
         configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Organization"
 
-    # url = configurations["data"]["openimis_url"]+":" + \
-    #     str(configurations["data"]["openimis_port"]) + \
-    #     "/api/api_fhir_r4/Contract"
     # Query the upstream server via openHIM mediator port 8000
     # Caution: To secure the endpoint with SSL certificate,FQDN is required
     if request.method == 'GET':
@@ -96,8 +93,6 @@ def getOrganisation(request):
         print(response.status_code)
 
         return Response(datac)
-
-        # return Response({"status": "Policy Resource successfully sent to OpenHIM channel"})
 
     elif request.method == 'POST':
         querystring = {"": ""}
