@@ -33,7 +33,7 @@ from overview.views import configview
 import http.client
 import base64
 
-from helpers.helpers import requests, formatTransactionPayload, postToSuresalamaChannel, getPortPart, getPaginatedRecords
+from helpers.helpers import requests, formatTransactionPayload, submitPaginatedResourcesToChannelCallback, postToSuresalamaChannel, getPortPart, getPaginatedRecords
 
 
 # Add this temprarily for testing purposes
@@ -85,18 +85,19 @@ def getLocation(request):
 
             datac = json.loads(response.text)
 
-            getPaginatedRecords(datac, url, payload, headers)
+            getPaginatedRecords(datac, url, payload, headers,
+                                submitPaginatedResourcesToChannelCallback)
 
-            channelPayload = formatTransactionPayload(
-                datac)
+            # channelPayload = formatTransactionPayload(
+            #     datac)
 
-            # # Post to Suresalama channel
-            open_him_url = configurations["data"]["openhim_url"]+':' + \
-                str(configurations["data"]["openhim_port"])
+            # # # Post to Suresalama channel
+            # open_him_url = configurations["data"]["openhim_url"]+':' + \
+            #     str(configurations["data"]["openhim_port"])
 
-            channelUrl = open_him_url + '/suresalama/resource'
+            # channelUrl = open_him_url + '/suresalama/resource'
 
-            postToSuresalamaChannel(channelUrl,  channelPayload)
+            # postToSuresalamaChannel(channelUrl,  channelPayload)
 
             print(response.status_code)
 

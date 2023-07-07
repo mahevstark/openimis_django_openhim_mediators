@@ -4,6 +4,8 @@ import requests
 
 from time import sleep
 
+from overview.views import configview
+
 
 # Add this temprarily for testing purposes
 # Will be taken out upon configuration of SSL certificate
@@ -67,7 +69,7 @@ def pingChannel(channelUrl, resource='', querystring={"": ""}):
         "GET", channelUrl, data=payload, headers=None, params=querystring, verify=False)
 
 
-def getPaginatedRecords(datac, url, payload, headers):
+def getPaginatedRecords(datac, url, payload, headers, submitToChannelCallback=None):
     try:
         entries = datac["entry"]
 
@@ -109,6 +111,15 @@ def getPaginatedRecords(datac, url, payload, headers):
 
                 print("got new data")
 
+                if (submitToChannelCallback):
+                    # Submit fetch records to the channnel before continuing
+                    # Submit per pagination
+                    print("About to submit to channel")
+
+                    sleep(1)
+
+                    submitToChannelCallback(datac2)
+
                 print(str(len(datac2['entry'])))
 
                 entries.extend(datac2['entry'])
@@ -121,3 +132,25 @@ def getPaginatedRecords(datac, url, payload, headers):
         print('%s' % type(e))
 
 # Change here to post latter (Updated)
+
+
+def submitPaginatedResourcesToChannelCallback(paginatedData):
+
+    result = configview()
+    configurations = result.__dict__
+
+    print(f'current data is this: {paginatedData}')
+
+    # Format and serialize data to JSON string
+
+    channelPayload = formatTransactionPayload(
+        paginatedData)
+    # # Post to Suresalama channel
+    open_him_url = configurations["data"]["openhim_url"]+':' + \
+        str(configurations["data"]["openhim_port"])
+
+    channelUrl = open_him_url + '/suresalama/resource'
+
+    postToSuresalamaChannel(channelUrl,  channelPayload)
+
+    # print(response.status_code)

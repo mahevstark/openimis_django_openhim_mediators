@@ -88,34 +88,39 @@ def getPatient(request):
 
             datac = json.loads(response.text)
 
-            getPaginatedRecords(datac, url, payload, headers)
-
             # Pass any subsequent data updates as callback parameters
 
             # Here we intend update to patient records retrieved to reflect organization Id
 
-            def update_patient_org(
-                data, org): return data['resource'].update(org)
+            def submitPaginatedResourcesToChannelCallback(paginatedData):
 
-            # Managing organization to be updated
+                print(f'current data is this: {paginatedData}')
 
-            org = {"managingOrganization": {
-                "reference": "Organization/"+str(org_id)}}
+                def update_patient_org(
+                    data, org): return data['resource'].update(org)
 
-            # Format and serialize data to JSON string
+                # Managing organization to be updated
 
-            channelPayload = formatTransactionPayload(
-                datac, update_patient_org, org)
+                org = {"managingOrganization": {
+                    "reference": "Organization/"+str(org_id)}}
 
-            # # Post to Suresalama channel
-            open_him_url = configurations["data"]["openhim_url"]+':' + \
-                str(configurations["data"]["openhim_port"])
+                # Format and serialize data to JSON string
 
-            channelUrl = open_him_url + '/suresalama/resource'
+                channelPayload = formatTransactionPayload(
+                    paginatedData, update_patient_org, org)
 
-            postToSuresalamaChannel(channelUrl,  channelPayload)
+                # # Post to Suresalama channel
+                open_him_url = configurations["data"]["openhim_url"]+':' + \
+                    str(configurations["data"]["openhim_port"])
 
-            print(response.status_code)
+                channelUrl = open_him_url + '/suresalama/resource'
+
+                postToSuresalamaChannel(channelUrl,  channelPayload)
+
+                print(response.status_code)
+
+            getPaginatedRecords(datac, url, payload, headers,
+                                submitPaginatedResourcesToChannelCallback)
 
             return Response(datac)
 
@@ -141,7 +146,7 @@ def getPatient(request):
         # return Response({"status": "errror", "message": str(e)})
 
 
-@api_view(['POST'])
+@ api_view(['POST'])
 def savePreference(request):
     try:
         print(" SavePreference executing ........")
@@ -327,7 +332,7 @@ def checkHeartbeat(openhim_mediator_utils):
     openhim_mediator_utils.activate_heartbeat()
 
 
-@api_view(['POST'])
+@ api_view(['POST'])
 def testPatient(request):
     print(request.data)
     print(json.dumps(request.data))

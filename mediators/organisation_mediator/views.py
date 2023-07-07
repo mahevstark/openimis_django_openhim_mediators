@@ -26,7 +26,7 @@ import requests
 from datetime import datetime
 from openhim_mediator_utils.main import Main
 from time import sleep
-from helpers.helpers import getPortPart, getPaginatedRecords, formatTransactionPayload, postToSuresalamaChannel
+from helpers.helpers import getPortPart, getPaginatedRecords, formatTransactionPayload, postToSuresalamaChannel, submitPaginatedResourcesToChannelCallback
 
 from overview.models import configs
 from overview.views import configview
@@ -73,22 +73,27 @@ def getOrganisation(request):
         # print(f'Contract headers {datac}')
 
         # Fetch all paginated records
-        getPaginatedRecords(datac, url, payload, headers)
+
+        #   getPaginatedRecords(datac, url, payload, headers,
+        #                         submitPaginatedResourcesToChannelCallback)
+
+        getPaginatedRecords(datac, url, payload, headers,
+                            submitPaginatedResourcesToChannelCallback)
 
         # Format and serialize data to JSON string
 
         # Pass any subsequent data updates as callback parameters
 
-        channelPayload = formatTransactionPayload(datac)
+        # channelPayload = formatTransactionPayload(datac)
 
-        # # Post to Suresalama channel
+        # # # Post to Suresalama channel
 
-        open_him_url = configurations["data"]["openhim_url"]+':' + \
-            str(configurations["data"]["openhim_port"])
+        # open_him_url = configurations["data"]["openhim_url"]+':' + \
+        #     str(configurations["data"]["openhim_port"])
 
-        channelUrl = open_him_url + '/suresalama/resource'
+        # channelUrl = open_him_url + '/suresalama/resource'
 
-        postToSuresalamaChannel(channelUrl,  channelPayload)
+        # postToSuresalamaChannel(channelUrl,  channelPayload)
 
         print(response.status_code)
 
