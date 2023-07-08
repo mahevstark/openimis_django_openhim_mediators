@@ -33,7 +33,7 @@ from overview.views import configview
 import http.client
 import base64
 
-from helpers.helpers import requests, formatTransactionPayload, postToSuresalamaChannel, getPortPart, getPaginatedRecords
+from helpers.helpers import requests, submitPaginatedResourcesToChannelCallback, getPortPart, getPaginatedRecords
 
 
 # Add this temprarily for testing purposes
@@ -85,18 +85,8 @@ def getCoverage(request):
 
             datac = json.loads(response.text)
 
-            getPaginatedRecords(datac, url, payload, headers)
-
-            channelPayload = formatTransactionPayload(
-                datac)
-
-            # # Post to Suresalama channel
-            open_him_url = configurations["data"]["openhim_url"]+':' + \
-                str(configurations["data"]["openhim_port"])
-
-            channelUrl = open_him_url + '/suresalama/resource'
-
-            postToSuresalamaChannel(channelUrl,  channelPayload)
+            getPaginatedRecords(datac, url, payload, headers,
+                                submitPaginatedResourcesToChannelCallback)
 
             print(response.status_code)
 

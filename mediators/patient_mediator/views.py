@@ -170,6 +170,18 @@ def savePreference(request):
         open_him_url = configurations["data"]["openhim_url"]+':' + \
             str(configurations["data"]["openhim_port"])
 
+        # ""
+        # insuranceProduct
+        # organization
+        # practitioner
+        # group
+        # insuree
+        # policy
+        # location
+        # claimResponse
+        # coverage
+        # coverageEligibility
+
         print(resources)
 
         if 'insuranceProduct' in resources:
@@ -178,15 +190,6 @@ def savePreference(request):
             url = open_him_url+'/openimis/product'
             # Send request to OpenHIM channel
             pingChannel(url, 'Insurance Product')
-
-        if 'insuree' in resources:
-            print('=====About to fetch and migrate insuree resource=====')
-
-            querystring = {"orgId": payload["orgId"] or ""}
-
-            url = open_him_url+'/openimis/insuree'
-            # Send request to OpenHIM channel
-            pingChannel(url, 'Insuree', querystring)
 
         if 'organization' in resources:
             print('=====About to fetch and migrate organization resource=====')
@@ -208,6 +211,15 @@ def savePreference(request):
             url = open_him_url+'/openimis/group'
             # Send request to OpenHIM channel
             pingChannel(url, 'Group')
+
+        if 'insuree' in resources:
+            print('=====About to fetch and migrate insuree resource=====')
+
+            querystring = {"orgId": payload["orgId"] or ""}
+
+            url = open_him_url+'/openimis/insuree'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'Insuree', querystring)
 
         if 'policy' in resources:
             print('=====About to fetch and migrate policy resource=====')

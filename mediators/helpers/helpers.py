@@ -75,7 +75,21 @@ def getPaginatedRecords(datac, url, payload, headers, submitToChannelCallback=No
 
         total = datac['total']
 
-        print(total)
+        print(f'Total is {total}')
+
+        if (submitToChannelCallback and len(datac["entry"]) > 0):
+            # Submit fetch records to the channnel before continuing
+            # Submit per pagination
+
+            resource = datac["entry"][0]['resource']['resourceType']
+
+            print(f"About to Submit first pagination of {resource} to channel")
+
+            response = submitToChannelCallback(datac)
+
+            print(
+                f'Print Status Code for aftter submission of {resource} to channel is {response.status_code}')
+
         have_now = len(datac['entry'])
         if total > 10:
             print('pagintion 1')
@@ -94,8 +108,6 @@ def getPaginatedRecords(datac, url, payload, headers, submitToChannelCallback=No
                 i = i+1
                 next_url = url + part_after_patient
 
-                # replace part before /api/ with url_him
-                # next_url = base_him + "/api/" + next_url.split("/api/", 1)[1]
                 print(next_url)
 
                 # Make the next request
@@ -111,14 +123,14 @@ def getPaginatedRecords(datac, url, payload, headers, submitToChannelCallback=No
 
                 print("got new data")
 
-                if (submitToChannelCallback):
+                if (submitToChannelCallback and len(datac["entry"]) > 0):
                     # Submit fetch records to the channnel before continuing
                     # Submit per pagination
                     print("About to submit to channel")
 
-                    sleep(1)
-
                     submitToChannelCallback(datac2)
+
+                    sleep(1)
 
                 print(str(len(datac2['entry'])))
 
@@ -151,6 +163,6 @@ def submitPaginatedResourcesToChannelCallback(paginatedData):
 
     channelUrl = open_him_url + '/suresalama/resource'
 
-    postToSuresalamaChannel(channelUrl,  channelPayload)
+    return postToSuresalamaChannel(channelUrl,  channelPayload)
 
     # print(response.status_code)

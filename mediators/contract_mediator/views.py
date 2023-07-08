@@ -9,7 +9,7 @@ Stephen Mburu:ahoazure@gmail.com & Peter Kaniu:peterkaniu254@gmail.com
 
 """
 
-from helpers.helpers import getPortPart, submitPaginatedResourcesToChannelCallback, postToSuresalamaChannel, getPaginatedRecords, formatTransactionPayload
+from helpers.helpers import getPortPart, submitPaginatedResourcesToChannelCallback, getPaginatedRecords
 from django.shortcuts import render
 
 from django.http import HttpResponse
@@ -74,32 +74,12 @@ def getContract(request):
             "GET", url, data=payload, headers=headers, params=querystring, verify=False)
         datac = json.loads(response.text)
 
-        # print(f'Contract headers {datac}')
-
         # Fetch all paginated records
         getPaginatedRecords(datac, url, payload, headers,
                             submitPaginatedResourcesToChannelCallback)
-
-        # Format and serialize data to JSON string
-
-        # Pass any subsequent data updates as callback parameters
-
-        # channelPayload = formatTransactionPayload(datac)
-
-        # # # Post to Suresalama channel
-
-        # open_him_url = configurations["data"]["openhim_url"]+':' + \
-        #     str(configurations["data"]["openhim_port"])
-
-        # channelUrl = open_him_url + '/suresalama/resource'
-
-        # postToSuresalamaChannel(channelUrl,  channelPayload)
-
         print(response.status_code)
 
         return Response(datac)
-
-        # return Response({"status": "Policy Resource successfully sent to OpenHIM channel"})
 
     elif request.method == 'POST':
         querystring = {"": ""}
