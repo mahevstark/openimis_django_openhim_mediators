@@ -88,7 +88,7 @@ def getPaginatedRecords(datac, url, payload, headers, submitToChannelCallback=No
             response = submitToChannelCallback(datac)
 
             print(
-                f'Print Status Code for aftter submission of {resource} to channel is {response.status_code}')
+                f'Status Code for aftter submission of {resource} to channel is {response.status_code}')
 
         have_now = len(datac['entry'])
         if total > 10:

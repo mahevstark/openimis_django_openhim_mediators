@@ -115,9 +115,9 @@ def getPatient(request):
 
                 channelUrl = open_him_url + '/suresalama/resource'
 
-                postToSuresalamaChannel(channelUrl,  channelPayload)
-
                 print(response.status_code)
+
+                return postToSuresalamaChannel(channelUrl,  channelPayload)
 
             getPaginatedRecords(datac, url, payload, headers,
                                 submitPaginatedResourcesToChannelCallback)
