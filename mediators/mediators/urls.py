@@ -21,7 +21,7 @@ from claim_mediator.views import getClaims
 from coverage_mediator.views import getCoverage
 from organisation_mediator.views import getOrganisation
 from group_mediator.views import getGroup
-from patient_mediator.views import getPatient, savePreference, testPatient
+from patient_mediator.views import getPatient, savePreference, fetchSingleResource, subscriptionHandler
 from practitioner_mediator.views import getPractitioner
 from contract_mediator.views import getContract
 from claimresponse_mediator.views import getClaimResponse
@@ -48,7 +48,8 @@ urlpatterns = [
     path('api/api_fhir_r4/Coverage', getCoverage),
     path('api/api_fhir_r4/Organisation', getOrganisation),
     path('api/api_fhir_r4/Patient', getPatient),
-    path('api/api_fhir_r4/Patient/test', testPatient),
+    path('api/api_fhir_r4/Resource', fetchSingleResource),
+    path('api/api_fhir_r4/SubscriptionHandler', subscriptionHandler),
     path('api/api_fhir_r4/Practitioner', getPractitioner),
     path('api/api_fhir_r4/Group', getGroup),
     path('api/api_fhir_r4/Location', getLocation),

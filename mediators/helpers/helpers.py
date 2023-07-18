@@ -1,6 +1,7 @@
 
 import json
 import requests
+import base64
 
 from time import sleep
 
@@ -166,3 +167,153 @@ def submitPaginatedResourcesToChannelCallback(paginatedData):
     return postToSuresalamaChannel(channelUrl,  channelPayload)
 
     # print(response.status_code)
+
+
+def find(predicate, iterable):
+    for item in iterable:
+        if predicate(item):
+            return item
+    return None
+
+
+# Create Subscription
+def createSubscriptionResourceOnOpenIMIS(resource, endpoint, headers, subscription_url):
+
+    print("==========Executing createSubscriptionResourceOnOpenIMIS ======= ")
+
+    print("========Resource========="+resource)
+
+    print(endpoint, headers, subscription_url)
+
+    try:
+
+        # "payload": "application/fhir+json",
+        # "header": [
+        #     "Authorization: Bearer secret-token-abc-123"
+        # ]
+
+        payload = {
+            "resourceType": "Subscription",
+            "status": "active",
+            "criteria": resource,
+            "reason": resource,
+            "channel": {
+                "type": "rest-hook",
+                "endpoint": endpoint,
+                "payload": "application/fhir+json",
+                "header": [
+                    "Authorization: Bearer secret-token-abc-123"
+                ]
+            },
+            "end": "4021-12-31T23:59:59Z"
+        }
+
+        payload = json.dumps(payload)
+
+        response = requests.request(
+            "POST", subscription_url, data=payload, headers={**headers,  'Content-Type': "application/json"}, verify=False)
+
+        data = json.loads(response.text)
+        return data
+    except Exception as e:
+        print('%s' % type(e))
+
+
+def findOrCreateOpenIMISSubscriptionResource(auth_openimis, resource):
+    result = configview()
+    configurations = result.__dict__
+
+    open_him_url = configurations["data"]["openhim_url"]+':' + \
+        str(configurations["data"]["openhim_port"])
+
+    status = ""
+
+    subscription_url = configurations["data"]["openimis_url"]+getPortPart(
+        configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Subscription/"
+
+    # channelUrl = open_him_url + '/resource/subscribe'
+    channel_subscription_url = 'https://143.198.111.7:5000/resource/subscribe'
+
+    headers = {'Authorization': auth_openimis}
+
+    response = requests.request(
+        "GET", subscription_url, data="", headers=headers, verify=False)
+
+    data = json.loads(response.text)
+
+    print(data)
+
+    if (len(data['entry']) > 0):
+        # Subscriptions are available
+
+        subscription = find(lambda x: x['resource']
+                            ['criteria'] == resource, data['entry'])
+
+        if (subscription is None):
+            # Subscription doesnt' exist Create a new Subscription for the given resource
+            new_subscription = createSubscriptionResourceOnOpenIMIS(
+                resource, channel_subscription_url, headers, subscription_url)
+
+            criteria, sub_id, status = new_subscription[
+                'criteria'], new_subscription['id'], new_subscription['status']
+
+            status = f'New Subscription for resoure ({resource}) created with id: {sub_id} and status: {status}'
+        else:
+            print(criteria, sub_id, status)
+            criteria, sub_id, status = subscription['resource']['criteria'], subscription[
+                'resource']['id'], subscription['resource']['status']
+
+            status = f'Subscription for resource ({criteria}) already exists with id: {sub_id}. Status is {status}'
+
+    return {"status": status}
+
+
+def fetchUniqueResource(resource_type, resource_id):
+
+    try:
+        print("==========Executing fetchUniqueResource ======= ")
+
+        data = initAuth()
+
+        configurations = data["config"]
+
+        auth_openimis = data["auth"]
+
+        if (len(str(resource_type)) > 0 and len(resource_id) > 0):
+            resource_type = resource_type.title()
+
+            url = configurations["data"]["openimis_url"]+getPortPart(
+                configurations["data"]["openimis_port"])+"/api/api_fhir_r4/"+str(resource_type)+"/"+str(resource_id)
+
+            headers = {
+                'Content-Type': "application/json",
+                'Authorization': auth_openimis
+            }
+
+            querystring = {"": ""}
+
+            payload = ""
+
+            response = requests.request(
+                "GET", url, data=payload, headers=headers, params=querystring, verify=False)
+
+            datac = json.loads(response.text)
+
+            return datac
+        return None
+    except Exception as e:
+        print('%s' % type(e))
+
+
+def initAuth():
+    result = configview()
+    configurations = result.__dict__
+    # username:password-openhimclient:openhimclientPasskey
+    authvars = configurations["data"]["openimis_user"] + \
+        ":"+configurations["data"]["openimis_passkey"]
+    # Standard Base64 Encoding
+    encodedBytes = base64.b64encode(authvars.encode("utf-8"))
+    encodedStr = str(encodedBytes, "utf-8")
+    auth_openimis = "Basic " + encodedStr
+
+    return {"auth": auth_openimis, "config": configurations}

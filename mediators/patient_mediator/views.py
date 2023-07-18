@@ -33,15 +33,17 @@ from overview.views import configview
 import http.client
 import base64
 
-from helpers.helpers import requests, formatTransactionPayload, postToSuresalamaChannel, getPortPart, pingChannel, getPaginatedRecords
+from helpers.helpers import requests, initAuth, fetchUniqueResource, formatTransactionPayload, postToSuresalamaChannel, getPortPart, pingChannel, getPaginatedRecords, findOrCreateOpenIMISSubscriptionResource
 
+from constants.resource import FhirResource
 
-# Add this temprarily for testing purposes
+# Add this temporarily for testing purposes
 # Will be taken out upon configuration of SSL certificate
 # from urllib3.exceptions import InsecureRequestWarning
 
 # Suppress only the single warning from urllib3 needed.
 # requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 
 @api_view(['GET', 'POST'])
 def getPatient(request):
@@ -70,7 +72,12 @@ def getPatient(request):
         url = configurations["data"]["openimis_url"]+getPortPart(
             configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Patient"
 
-        # retur`n url
+        # Verify existience of Subscription and create if it doesn't exists;
+
+        # result = findOrCreateOpenIMISSubscriptionResource(
+        #     auth_openimis, FhirResource.Patient)
+
+        # return Response({"data": result})
 
         if page_offset != "":
             url = url+"?page-offset="+page_offset
@@ -80,7 +87,11 @@ def getPatient(request):
             print(" yes I was here")
             querystring = {"": ""}
             payload = ""
-            headers = {'Authorization': auth_openimis}
+
+            headers = {
+                'Content-Type': "application/json",
+                'Authorization': auth_openimis
+            }
             print(url)
             print(headers)
             response = requests.request(
@@ -146,7 +157,7 @@ def getPatient(request):
         # return Response({"status": "errror", "message": str(e)})
 
 
-@ api_view(['POST'])
+@api_view(['POST'])
 def savePreference(request):
     try:
         print(" SavePreference executing ........")
@@ -169,19 +180,6 @@ def savePreference(request):
         # Add channel authenication latter
         open_him_url = configurations["data"]["openhim_url"]+':' + \
             str(configurations["data"]["openhim_port"])
-
-        # ""
-        # insuranceProduct
-        # organization
-        # practitioner
-        # group
-        # insuree
-        # policy
-
-        # location
-        # claimResponse
-        # coverage
-        # coverageEligibility
 
         print(resources)
 
@@ -274,6 +272,78 @@ def savePreference(request):
         return Response({'status': "error", 'message': str(e)})
 
 
+@api_view(['POST'])
+def fetchSingleResource(request):
+
+    try:
+
+        body = request.body.decode('utf-8')
+
+        payload = json.loads(body)
+
+        resource_type = payload["resourceType"]
+
+        resource_id = payload["resourceId"]
+
+        print(resource_type)
+
+        resource = fetchUniqueResource(resource_type, resource_id)
+
+        if (resource):
+            return Response({"status": "success", "data": resource}, content_type='application/json', status_code=200)
+
+        # Standard Base64 Encoding
+        return Response({"status": "failed", "message": "Failed to fetch message"}, status_code=400, content_type='application/json')
+    except Exception as e:
+        print('%s' % type(e))
+
+
+@api_view(['POST'])
+def subscriptionHandler(request):
+
+    try:
+
+        configurations = initAuth()["config"]
+
+        body = request.body.decode('utf-8')
+
+        payload = json.loads(body)
+
+        # print(payload)
+
+        resource_type = payload["resourceType"].title()
+
+        resource_id = payload["id"]
+
+        # # Post to Suresalama channel
+        open_him_url = configurations["data"]["openhim_url"]+':' + \
+            str(configurations["data"]["openhim_port"])
+
+        channelUrl = open_him_url + '/suresalama/singleResource'
+
+        if (resource_type == FhirResource.Patient):
+            resource = fetchUniqueResource(resource_type, resource_id)
+            print(resource)
+            if (resource):
+                # Send to Suresamala Single resource Channel
+
+                postToSuresalamaChannel(channelUrl, payload)
+
+                return Response({"status": "success", "message": "Resource sent"}, status=200, content_type='application/json')
+
+            return Response({"status": "failed", "message": "Failed to fetch message"}, status=400, content_type='application/json')
+
+            # Send Other resources to Suresamala Single resource Channel
+        postToSuresalamaChannel(channelUrl, payload)
+
+        return Response({"status": "success", "message": "Resource sent"}, status=200, content_type='application/json')
+
+    except Exception as e:
+        print('%s' % type(e))
+
+        return Response({"status": "failed", "message": type(e)}, status=500, content_type='application/json')
+
+
 def registerPatientMediator():
     result = configview()
     configurations = result.__dict__
@@ -343,12 +413,6 @@ def registerPatientMediator():
 # Morning the health status of the client on the console
 def checkHeartbeat(openhim_mediator_utils):
     openhim_mediator_utils.activate_heartbeat()
-
-
-@ api_view(['POST'])
-def testPatient(request):
-    print(request.data)
-    print(json.dumps(request.data))
 
 
 # when the resource is create or updated, the server sends request to openHIM channe
