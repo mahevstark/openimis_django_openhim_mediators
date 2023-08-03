@@ -203,14 +203,7 @@ def savePreference(request):
             url = open_him_url+'/openimis/practitioner'
             # Send request to OpenHIM channel
             pingChannel(url, 'Practitioner')
-
-        if 'group' in resources:
-            print('=====About to fetch and migrate group resource=====')
-
-            url = open_him_url+'/openimis/group'
-            # Send request to OpenHIM channel
-            pingChannel(url, 'Group')
-
+            
         if 'insuree' in resources:
             print('=====About to fetch and migrate insuree resource=====')
 
@@ -219,6 +212,13 @@ def savePreference(request):
             url = open_him_url+'/openimis/insuree'
             # Send request to OpenHIM channel
             pingChannel(url, 'Insuree', querystring)
+
+        if 'group' in resources:
+            print('=====About to fetch and migrate group resource=====')
+
+            url = open_him_url+'/openimis/group'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'Group')
 
         if 'policy' in resources:
             print('=====About to fetch and migrate policy resource=====')
@@ -265,11 +265,11 @@ def savePreference(request):
     # USERNAME = configurations["data"]["openhim_user"]
     # PASSWORD = configurations["data"]["openhim_passkey"]
 
-        return Response({'status': "sucess", 'message': 'Preference save succesfully'})
+        return Response({'status': "sucess", 'message': 'Preference save succesfully'}, status=200, content_type="application/json")
 
     except Exception as e:
         print('%s' % type(e))
-        return Response({'status': "error", 'message': str(e)})
+        return Response({'status': "error", 'message': str(e)},  status=500, content_type="application/json")
 
 
 @api_view(['POST'])
