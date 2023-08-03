@@ -275,6 +275,8 @@ def savePreference(request):
 @api_view(['POST'])
 def fetchSingleResource(request):
 
+    print("========= Executing fetchSingleResource ========== ")
+    
     try:
 
         body = request.body.decode('utf-8')
@@ -288,14 +290,15 @@ def fetchSingleResource(request):
         print(resource_type)
 
         resource = fetchUniqueResource(resource_type, resource_id)
-
-        if (resource):
-            return Response({"status": "success", "data": resource}, content_type='application/json', status_code=200)
+        
+        if (resource and resource["resourceType"] == resource_type):
+            return Response({"status": "success", "data": resource, "code":"200"}, content_type="application/json", status="200")
 
         # Standard Base64 Encoding
-        return Response({"status": "failed", "message": "Failed to fetch message"}, status_code=400, content_type='application/json')
+        return Response({"status": "failed", "message": "Failed to fetch resource", "code":"404"}, status=400, content_type='application/json')
     except Exception as e:
         print('%s' % type(e))
+        return Response({"status": "failed", "message": "Internal server error"}, status=500, content_type='application/json')
 
 
 @api_view(['POST'])
