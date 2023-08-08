@@ -42,6 +42,69 @@ def formatTransactionPayload(datac, callback=None, data_to_update={}):
     return payload
 
 
+def formatLocationTransactionPayload(datac):
+    print('=========Executing formatLocationTransactionPayload========= ')
+    
+    location_id_list = [{"id": entry["resource"]["id"]} for entry in datac["entry"]]
+    
+    request_dict = {"method": "PUT"}
+
+    datac["type"] = "transaction"
+    
+    size = len(datac["entry"])
+    
+    def retrieveAndUpdateLocationPartOfValue(entry: dict, entryBundle: dict):
+        
+      try:
+            print('=========Executing retrieveAndUpdateLocationPartOfValue========= ')
+        
+            result = configview()
+            
+            configurations = result.__dict__
+            
+            if("partOf" not in entry):
+                return None
+                
+            part_of_reference = str(entry["partOf"]["reference"]).split("/")
+                
+            search_location_id = {"id": part_of_reference[1]}
+            
+            if(search_location_id in location_id_list):
+                # Fetch the single location the resource
+                return None
+                
+            fetchedLocation = fetchUniqueResource(part_of_reference[0], part_of_reference[1])
+            
+            fetchedEntry = {"fullUrl":f"{configurations['data']['openimis_url']}/api/api_fhir_r4/Location/{fetchedLocation['id']}","resource": fetchedLocation}
+            
+            fetchedEntry["request"] = {**request_dict, "url":f"{part_of_reference[0]}?identifier={part_of_reference[1]}"}
+            
+            location_id_list.append({"id": fetchedLocation["id"]})
+            
+            entryBundle["entry"].append(fetchedEntry)
+            
+            return retrieveAndUpdateLocationPartOfValue(fetchedLocation, entryBundle)
+      except  Exception as e:
+            print('%s' % type(e))
+          
+             
+    for i in range(size):
+        location_id = datac["entry"][i]["resource"]["id"]
+        
+        entry = datac["entry"][i]
+        
+        resource_type = datac["entry"][i]["resource"]["resourceType"]
+        
+        datac["entry"][i].update({"request": {**request_dict, "url":f"{resource_type}?identifier={location_id}"}})
+        
+        retrieveAndUpdateLocationPartOfValue(entry["resource"], datac)
+
+    payload = json.dumps(datac)
+
+    return payload
+
+
+
 def postToSuresalamaChannel(url, payload):
     print('=========Executing postToSuresalamaChannel========= ')
     querystring = {"": ""}
@@ -81,13 +144,12 @@ def getPaginatedRecords(datac, url, payload, headers, submitToChannelCallback=No
         if (submitToChannelCallback and len(datac["entry"]) > 0):
             # Submit fetch records to the channnel before continuing
             # Submit per pagination
-
             resource = datac["entry"][0]['resource']['resourceType']
 
             print(f"About to Submit first pagination of {resource} to channel")
 
             response = submitToChannelCallback(datac)
-
+            
             print(
                 f'Status Code for aftter submission of {resource} to channel is {response.status_code}')
 
@@ -123,8 +185,10 @@ def getPaginatedRecords(datac, url, payload, headers, submitToChannelCallback=No
                     break
 
                 print("got new data")
+                
+                # len(datac["entry"]) > 0
 
-                if (submitToChannelCallback and len(datac["entry"]) > 0):
+                if (submitToChannelCallback and datac2["entry"]):
                     # Submit fetch records to the channnel before continuing
                     # Submit per pagination
                     print("About to submit to channel")
@@ -157,6 +221,26 @@ def submitPaginatedResourcesToChannelCallback(paginatedData):
     # Format and serialize data to JSON string
 
     channelPayload = formatTransactionPayload(
+        paginatedData)
+    # # Post to Suresalama channel
+    open_him_url = configurations["data"]["openhim_url"]+':' + \
+        str(configurations["data"]["openhim_port"])
+
+    channelUrl = open_him_url + '/suresalama/resource'
+
+    return postToSuresalamaChannel(channelUrl,  channelPayload)
+
+    # print(response.status_code)
+    
+def submitPaginatedLocationResourcesToChannelCallback(paginatedData):
+
+    result = configview()
+    configurations = result.__dict__
+
+    print(f'current data is this: {paginatedData}')
+
+    # Format and serialize data to JSON string
+    channelPayload = formatLocationTransactionPayload(
         paginatedData)
     # # Post to Suresalama channel
     open_him_url = configurations["data"]["openhim_url"]+':' + \

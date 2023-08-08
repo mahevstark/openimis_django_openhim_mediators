@@ -33,7 +33,7 @@ from overview.views import configview
 import http.client
 import base64
 
-from helpers.helpers import requests, submitPaginatedResourcesToChannelCallback, getPortPart, getPaginatedRecords
+from helpers.helpers import requests, submitPaginatedLocationResourcesToChannelCallback, getPortPart, getPaginatedRecords, initAuth
 
 
 # Add this temprarily for testing purposes
@@ -54,19 +54,11 @@ def getLocation(request):
         print("page_offset")
         print(page_offset)
 
-        result = configview()
-        configurations = result.__dict__
-        # username:password-openhimclient:openhimclientPasskey
-        authvars = configurations["data"]["openimis_user"] + \
-            ":"+configurations["data"]["openimis_passkey"]
-        # Standard Base64 Encoding
-        encodedBytes = base64.b64encode(authvars.encode("utf-8"))
-        encodedStr = str(encodedBytes, "utf-8")
-        auth_openimis = "Basic " + encodedStr
+        auth_data = initAuth()
 
         # Standard Base64 Encoding
-        url = configurations["data"]["openimis_url"]+getPortPart(
-            configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Location"
+        url = auth_data["config"]["data"]["openimis_url"]+getPortPart(
+            auth_data["config"]["data"]["openimis_port"])+"/api/api_fhir_r4/Location"
 
         # retur`n url
 
@@ -77,7 +69,7 @@ def getLocation(request):
         if request.method == 'GET':
             querystring = {"": ""}
             payload = ""
-            headers = {'Authorization': auth_openimis}
+            headers = {'Authorization': auth_data["auth"]}
             print(url)
             print(headers)
             response = requests.request(
@@ -86,11 +78,11 @@ def getLocation(request):
             datac = json.loads(response.text)
 
             getPaginatedRecords(datac, url, payload, headers,
-                                submitPaginatedResourcesToChannelCallback)
+                                submitPaginatedLocationResourcesToChannelCallback)
 
             print(response.status_code)
 
-            return Response(datac)
+            return Response(data)
 
             # return response.json()
         elif request.method == 'POST':
@@ -100,7 +92,7 @@ def getLocation(request):
             payload = data
             headers = {
                 'Content-Type': "application/json",
-                'Authorization': auth_openimis
+                'Authorization': auth_data["auth"]
             }
             response = requests.request(
                 "POST", url, data=payload, headers=headers, params=querystring)
