@@ -387,7 +387,7 @@ def fetchUniqueResource(resource_type, resource_id):
         return None
     except Exception as e:
         print('%s' % type(e))
-
+        
 
 def initAuth():
     result = configview()

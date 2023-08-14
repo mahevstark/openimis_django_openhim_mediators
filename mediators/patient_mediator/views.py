@@ -45,7 +45,7 @@ from constants.resource import FhirResource
 # requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'PUT'])
 def getPatient(request):
     try:
         print(" Executing getPatient ........")
@@ -78,6 +78,8 @@ def getPatient(request):
         #     auth_openimis, FhirResource.Patient)
 
         # return Response({"data": result})
+        
+        error_message = ""
 
         if page_offset != "":
             url = url+"?page-offset="+page_offset
@@ -136,24 +138,65 @@ def getPatient(request):
             return Response(datac)
 
             # return response.json()
-        elif request.method == 'POST':
-            print(" yes I was here 2")
-
-            querystring = {"": ""}
-            data = json.dumps(request.data)
-            payload = data
+        elif request.method == 'POST' or request.method == 'PUT':
+            
+            reqBody = request.data
+            
+            resource_type = reqBody["resourceType"]
+            
+            resource_id = reqBody["id"]
+            
+            resource = fetchUniqueResource(resource_type, resource_id)
+            
             headers = {
                 'Content-Type': "application/json",
                 'Authorization': auth_openimis
             }
+            
+            querystring = {"": ""}
+            
+            payload = json.dumps(reqBody)
+
+            if (resource and resource["resourceType"] == resource_type):
+                
+                print("Update Patient resource")
+
+                # Update Resource
+                
+                put_url = configurations["data"]["openimis_url"]+getPortPart(
+                configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Patient/"+str(resource_id)+"/"
+                
+                print(put_url)
+                
+                response = requests.request(
+                "PUT", put_url, data=payload, headers=headers, params=querystring, verify=False)
+                
+                datac = json.loads(response.text)
+                
+                # @Todo: Handle error message properly latter
+                
+                return Response(datac)
+                
+            # Create Patient resource
+            
+            print("Create Patient resource")
+
+            url = url + "/"
+            
+            print(url)
+            
             response = requests.request(
-                "POST", url, data=payload, headers=headers, params=querystring)
+                "POST", url, data=payload, headers=headers, params=querystring, verify=False)
+            
             datac = json.loads(response.text)
+            
+            # @Todo: Handle error message properly latter
+            
             return Response(datac)
 
     except Exception as e:
         print('%s' % type(e))
-
+   
         # return Response({"status": "errror", "message": str(e)})
 
 
