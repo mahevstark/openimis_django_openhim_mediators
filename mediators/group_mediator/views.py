@@ -33,7 +33,7 @@ from overview.views import configview
 import http.client
 import base64
 
-from helpers.helpers import requests, submitPaginatedResourcesToChannelCallback, getPortPart, getPaginatedRecords
+from helpers.helpers import requests, submitPaginatedResourcesToChannelCallback, getPortPart, getPaginatedRecords, fetchUniqueResource
 
 
 # Add this temprarily for testing purposes
@@ -94,16 +94,50 @@ def getGroup(request):
             # return response.json()
         elif request.method == 'POST':
             
+            reqBody = request.data
+            
+            resource_type = reqBody["resourceType"]
+            
+            resource_id = reqBody["id"]
+            
+            resource = fetchUniqueResource(resource_type, resource_id)
+            
+            headers = {
+                'Content-Type': "application/json",
+                'Authorization': auth_openimis
+            }
+            
+            querystring = {"": ""}
+            
+            payload = json.dumps(reqBody)
+
+            if (resource and resource["resourceType"] == resource_type):
+                
+                print("Update Group resource")
+
+                # Update Resource
+                
+                put_url = configurations["data"]["openimis_url"]+getPortPart(
+                configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Group/"+str(resource_id)+"/"
+                
+                print(put_url)
+                
+                response = requests.request(
+                "PUT", put_url, data=payload, headers=headers, params=querystring, verify=False)
+                
+                datac = json.loads(response.text)
+                
+                # @Todo: Handle error message properly latter
+                
+                return Response(datac)
+            
             url = url + "/"
             print("Create Group resource")
 
             querystring = {"": ""}
             data = json.dumps(request.data)
             payload = data
-            headers = {
-                'Content-Type': "application/json",
-                'Authorization': auth_openimis
-            }
+           
             response = requests.request(
                 "POST", url, data=payload, headers=headers, params=querystring, verify=False)
             datac = json.loads(response.text)
