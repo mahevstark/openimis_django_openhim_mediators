@@ -2,3 +2,4 @@ env
 env/*
 /.env
 /kubernetes/secret.yaml
+/.venv-openimis

@@ -93,6 +93,9 @@ def getGroup(request):
 
             # return response.json()
         elif request.method == 'POST':
+            
+            url = url + "/"
+
 
             querystring = {"": ""}
             data = json.dumps(request.data)
@@ -102,7 +105,7 @@ def getGroup(request):
                 'Authorization': auth_openimis
             }
             response = requests.request(
-                "POST", url, data=payload, headers=headers, params=querystring)
+                "POST", url, data=payload, headers=headers, params=querystring, verify=False)
             datac = json.loads(response.text)
             return Response(datac)
 
