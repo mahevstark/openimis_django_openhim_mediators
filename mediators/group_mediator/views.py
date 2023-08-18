@@ -95,7 +95,7 @@ def getGroup(request):
         elif request.method == 'POST':
             
             url = url + "/"
-
+            print("Create Group resource")
 
             querystring = {"": ""}
             data = json.dumps(request.data)
