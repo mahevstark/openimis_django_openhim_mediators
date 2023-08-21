@@ -225,6 +225,13 @@ def savePreference(request):
             str(configurations["data"]["openhim_port"])
 
         print(resources)
+        
+        if 'codesystem' in resources:
+            print('=====About to fetch and migrate codesystem resource=====')
+
+            url = open_him_url+'/openimis/codesystem'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'Codesystem')
 
         if 'insuranceProduct' in resources:
             print('=====About to fetch and migrate insurance products resource=====')
