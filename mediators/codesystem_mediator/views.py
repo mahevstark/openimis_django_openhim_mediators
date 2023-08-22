@@ -123,7 +123,7 @@ def getCodesystem(request):
 
             channelUrl = open_him_url + '/suresalama/resource'
             
-            postToSuresalamaChannel(channelUrl, codesystemBundle)
+            postToSuresalamaChannel(channelUrl, json.dumps(codesystemBundle))
             
             return Response(codesystemBundle)
 
