@@ -102,8 +102,6 @@ def getCodesystem(request):
                 response = requests.request(
                 "GET", new_url, data=payload, headers=headers, params=querystring, verify=False)
                 
-                print(response.text)
-
                 datac = json.loads(response.text)
                 
                 name= datac["name"]
