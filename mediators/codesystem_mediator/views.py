@@ -104,6 +104,9 @@ def getCodesystem(request):
                 
                 datac = json.loads(response.text)
                 
+                if system == 'organization-ph-legal-form':
+                    datac["id"] = system
+                
                 name= datac["name"]
                                 
                 entry = {
