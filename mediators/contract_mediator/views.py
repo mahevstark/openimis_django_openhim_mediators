@@ -82,6 +82,7 @@ def getContract(request):
         return Response(datac)
 
     elif request.method == 'POST':
+        url = url + "/"
         querystring = {"": ""}
         data = json.dumps(request.data)
         payload = data
