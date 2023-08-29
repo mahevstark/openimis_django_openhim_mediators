@@ -91,7 +91,7 @@ def getContract(request):
             'Authorization': auth_openimis
         }
         response = requests.request(
-            "POST", url, data=payload, headers=headers, params=querystring)
+            "POST", url, data=payload, headers=headers, params=querystring, verify=False)
         datac = json.loads(response.text)
         return Response(datac)
 
