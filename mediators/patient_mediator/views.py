@@ -239,6 +239,13 @@ def savePreference(request):
             url = open_him_url+'/openimis/medication'
             # Send request to OpenHIM channel
             pingChannel(url, 'Medication')
+        
+        if 'activityDefinition' in resources:
+            print('=====About to fetch and migrate medical service (ActivityDefinition) resources=====')
+
+            url = open_him_url+'/openimis/activityDefinition'
+            # Send request to OpenHIM channel
+            pingChannel(url, 'ActivityDefinition')
 
         if 'insuranceProduct' in resources:
             print('=====About to fetch and migrate insurance products resource=====')
@@ -319,8 +326,6 @@ def savePreference(request):
             # Send request to OpenHIM channel
             pingChannel(url, 'CoverageEligibility')
             
-        # git commit -m "feat: Add medication mediator to migrate openIMIS medication resource AB#
-
     # USERNAME = configurations["data"]["openhim_user"]
     # PASSWORD = configurations["data"]["openhim_passkey"]
 
