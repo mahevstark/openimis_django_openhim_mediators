@@ -41,6 +41,7 @@ from coverageeligibilityrequest_mediator.views import registerCoverageEligibilit
 from insuranceplan_mediator.views import registerInsurancePlanMediator
 from location_mediator.views import registerLocationMediator
 from codesystem_mediator.views import getCodesystem
+from medication_mediator.views import getMedication
 
 
 urlpatterns = [
@@ -63,6 +64,8 @@ urlpatterns = [
          getCoverageEligibilityRequest),
     path('api/api_fhir_r4/CodeSystem',
          getCodesystem),
+     path('api/api_fhir_r4/Medication',
+         getMedication),
 ]
 
 # register Mediators - once -- uncomment after setting up variables
