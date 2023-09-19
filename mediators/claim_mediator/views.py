@@ -98,12 +98,15 @@ def getClaims(request):
             querystring = {"": ""}
             data = json.dumps(request.data)
             payload = data
+            
+            url = url + "/" 
+            
             headers = {
                 'Content-Type': "application/json",
                 'Authorization': auth_openimis
             }
             response = requests.request(
-                "POST", url, data=payload, headers=headers, params=querystring)
+                "POST", url, data=payload, headers=headers, params=querystring, verify=False)
             datac = json.loads(response.text)
             return Response(datac)
 
