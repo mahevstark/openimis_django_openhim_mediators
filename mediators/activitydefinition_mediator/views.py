@@ -102,7 +102,7 @@ def getActivityDefinition(request):
 
         if (resource and resource["resourceType"] == resource_type):
             
-            print("Update Group resource")
+            print("Update AcivityDefinition resource")
 
             # Update Resource
             
