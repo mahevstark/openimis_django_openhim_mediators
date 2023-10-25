@@ -1,7 +1,7 @@
 """
-Settings for openhim Contract mediator developed in Django.
+Settings for openhim ActivityDefinition mediator developed in Django.
 
-The python-based Contract mediator implements python-utils 
+The python-based ActivityDefinition mediator implements python-utils 
 from https://github.com/de-laz/openhim-mediator-utils-py.git.
 
 For more information on this file, contact the Python developers
@@ -9,7 +9,7 @@ Stephen Mburu:ahoazure@gmail.com & Peter Kaniu:peterkaniu254@gmail.com
 
 """
 
-from helpers.helpers import getPortPart, submitPaginatedResourcesToChannelCallback, getPaginatedRecords
+from helpers.helpers import getPortPart, submitPaginatedResourcesToChannelCallback, getPaginatedRecords, fetchUniqueResource
 from django.shortcuts import render
 
 from django.http import HttpResponse
@@ -82,7 +82,47 @@ def getActivityDefinition(request):
         return Response(datac)
 
     elif request.method == 'POST':
+        
+        reqBody = request.data
+            
+        resource_type = reqBody["resourceType"]
+            
+        resource_id = reqBody["id"]
+        
+        resource = fetchUniqueResource(resource_type, resource_id)
+            
+        headers = {
+            'Content-Type': "application/json",
+            'Authorization': auth_openimis
+        }
+            
+        querystring = {"": ""}
+            
+        payload = json.dumps(reqBody)
+
+        if (resource and resource["resourceType"] == resource_type):
+            
+            print("Update Group resource")
+
+            # Update Resource
+            
+            put_url = configurations["data"]["openimis_url"]+getPortPart(
+            configurations["data"]["openimis_port"])+"/api/api_fhir_r4/ActivityDefinition/"+str(resource_id)+"/"
+            
+            print(put_url)
+            
+            response = requests.request(
+            "PUT", put_url, data=payload, headers=headers, params=querystring, verify=False)
+            
+            datac = json.loads(response.text)
+            
+            # @Todo: Handle error message properly latter
+            
+            return Response(datac)
+            
         url = url + "/"
+        print("Create ActivityDefinition resource")
+
         querystring = {"": ""}
         data = json.dumps(request.data)
         payload = data
