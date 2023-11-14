@@ -33,7 +33,7 @@ from overview.views import configview
 import http.client
 import base64
 
-from helpers.helpers import requests, submitPaginatedLocationResourcesToChannelCallback, getPortPart, getPaginatedRecords, initAuth
+from helpers.helpers import requests, fetchUniqueResource, submitPaginatedLocationResourcesToChannelCallback, getPortPart, getPaginatedRecords, initAuth
 
 
 # Add this temprarily for testing purposes
@@ -86,6 +86,45 @@ def getLocation(request):
 
             # return response.json()
         elif request.method == 'POST':
+            
+            reqBody = request.data
+            
+            resource_type = reqBody["resourceType"]
+            
+            resource_id = reqBody["id"]
+            
+            resource = fetchUniqueResource(resource_type, resource_id)
+            
+            headers = {
+                'Content-Type': "application/json",
+                'Authorization': auth_data["auth"]
+            }
+            
+            querystring = {"": ""}
+            
+            payload = json.dumps(reqBody)
+
+            if (resource and resource["resourceType"] == resource_type):
+                
+                print("Update Location resource")
+
+                # Update Resource
+                
+                put_url = auth_data["config"]["data"]["openimis_url"]+getPortPart(
+                auth_data["config"]["data"]["openimis_port"])+"/api/api_fhir_r4/Location/"+str(resource_id)+"/"
+                
+                print(put_url)
+                
+                response = requests.request(
+                "PUT", put_url, data=payload, headers=headers, params=querystring, verify=False)
+                
+                datac = json.loads(response.text)
+                
+                return Response(datac)
+            
+            url = url + "/"
+            print("Create Location resource")
+            
 
             querystring = {"": ""}
             data = json.dumps(request.data)
@@ -95,7 +134,7 @@ def getLocation(request):
                 'Authorization': auth_data["auth"]
             }
             response = requests.request(
-                "POST", url, data=payload, headers=headers, params=querystring)
+                "POST", url, data=payload, headers=headers, params=querystring, verify=False)
             datac = json.loads(response.text)
             return Response(datac)
 
