@@ -96,7 +96,13 @@ def getOrganisation(request):
     
     
     elif request.method == 'PUT':
-        url = url + "/"
+        
+        resource_id = request.data['id']
+        
+        if not resource_id:
+            raise Exception("No resource Id Found")
+
+        url = url + f"/{resource_id}/"
         
         print("Update Organization resource")
         

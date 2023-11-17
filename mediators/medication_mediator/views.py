@@ -32,13 +32,14 @@ from overview.models import configs
 from overview.views import configview
 import http.client
 import base64
+from helpers.helpers import requests, getPortPart, getPaginatedRecords, initAuth
 
 
 # Add this temprarily for testing purposes
 # Will be taken out upon configuration of SSL certificate
-from urllib3.exceptions import InsecureRequestWarning
+# from urllib3.exceptions import InsecureRequestWarning
 
-requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+# requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
 @api_view(['GET', 'POST'])
@@ -46,28 +47,37 @@ def getMedication(request):
 
     print("========Executing getMedication method========")
 
-    result = configview()
-    configurations = result.__dict__
-    # username:password-openhimclient:openhimclientPasskey
-    authvars = configurations["data"]["openimis_user"] + \
-        ":"+configurations["data"]["openimis_passkey"]
-    # Standard Base64 Encoding
-    encodedBytes = base64.b64encode(authvars.encode("utf-8"))
-    encodedStr = str(encodedBytes, "utf-8")
-    auth_openimis = "Basic " + encodedStr
+    # result = configview()
+    # configurations = result.__dict__
+    # # username:password-openhimclient:openhimclientPasskey
+    # authvars = configurations["data"]["openimis_user"] + \
+    #     ":"+configurations["data"]["openimis_passkey"]
+    # # Standard Base64 Encoding
+    # encodedBytes = base64.b64encode(authvars.encode("utf-8"))
+    # encodedStr = str(encodedBytes, "utf-8")
+    # auth_openimis = "Basic " + encodedStr
+    
+    auth_data = initAuth()
+    
+    page_offset = request.GET.get("page-offset", "")
 
-    url = configurations["data"]["openimis_url"]+getPortPart(
-        configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Medication"
+
+    url = auth_data["data"]["openimis_url"]+getPortPart(
+        auth_data["data"]["openimis_port"])+"/api/api_fhir_r4/Medication"
 
     # url = configurations["data"]["openimis_url"]+":" + \
     #     str(configurations["data"]["openimis_port"]) + \
     #     "/api/api_fhir_r4/Contract"
     # Query the upstream server via openHIM mediator port 8000
     # Caution: To secure the endpoint with SSL certificate,FQDN is required
+    
+    if page_offset != "":
+        url = url+"?page-offset="+page_offset
+    
     if request.method == 'GET':
         querystring = {"": ""}
         payload = ""
-        headers = {'Authorization': auth_openimis}
+        headers = {'Authorization': auth_data["auth"]}
 
         print(f'Medication headers {headers}')
         response = requests.request(
@@ -82,17 +92,42 @@ def getMedication(request):
         return Response(datac)
 
     elif request.method == 'POST':
+        print("Create Medication resource")
+
         url = url + "/"
         querystring = {"": ""}
         data = json.dumps(request.data)
         payload = data
         headers = {
             'Content-Type': "application/json",
-            'Authorization': auth_openimis
+            'Authorization': auth_data["auth"]
         }
         response = requests.request(
             "POST", url, data=payload, headers=headers, params=querystring, verify=False)
         datac = json.loads(response.text)
+        return Response(datac)
+
+    elif request.method == 'PUT':
+        resource_id = request.data['id']
+        
+        if not resource_id:
+            raise Exception("No resource Id Found")
+
+        url = url + f"/{resource_id}/"
+        
+        print("Update Medication resource")
+        
+        querystring = {"": ""}
+        data = json.dumps(request.data)
+        payload = data
+        headers = {
+            'Content-Type': "application/json",
+            'Authorization': auth_data['auth']
+        }
+        response = requests.request(
+            "PUT", url, data=payload, headers=headers, params=querystring, verify=False)
+        datac = json.loads(response.text)
+        
         return Response(datac)
 
 
