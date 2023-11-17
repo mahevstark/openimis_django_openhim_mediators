@@ -104,6 +104,9 @@ def getOrganisation(request):
 
         url = url + f"/{resource_id}/"
         
+        print(url)
+
+        
         print("Update Organization resource")
         
         querystring = {"": ""}
@@ -115,6 +118,8 @@ def getOrganisation(request):
         }
         response = requests.request(
             "PUT", url, data=payload, headers=headers, params=querystring, verify=False)
+        print(response)
+        
         datac = json.loads(response.text)
         
         return Response(datac)
