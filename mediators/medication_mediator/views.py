@@ -59,6 +59,8 @@ def getMedication(request):
     
     auth_data = initAuth()
     
+    print(auth_data)
+    
     page_offset = request.GET.get("page-offset", "")
 
 
