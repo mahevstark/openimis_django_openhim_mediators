@@ -42,7 +42,7 @@ from helpers.helpers import requests, getPortPart, getPaginatedRecords, initAuth
 # requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'PUT'])
 def getMedication(request):
 
     print("========Executing getMedication method========")
