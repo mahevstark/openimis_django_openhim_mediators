@@ -65,7 +65,7 @@ def getMedication(request):
 
 
     url = auth_data["data"]["openimis_url"]+getPortPart(
-        auth_data["data"]["openimis_port"])+"/api/api_fhir_r4/Medication"
+        auth_data['config']["data"]["openimis_port"])+"/api/api_fhir_r4/Medication"
 
     # url = configurations["data"]["openimis_url"]+":" + \
     #     str(configurations["data"]["openimis_port"]) + \
