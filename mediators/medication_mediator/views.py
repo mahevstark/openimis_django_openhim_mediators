@@ -61,12 +61,12 @@ def getMedication(request):
     
     print(auth_data)
     
-    print("On Medicatio handler")
+    print("On Medication handler")
     
     page_offset = request.GET.get("page-offset", "")
 
 
-    url = auth_data["data"]["openimis_url"]+getPortPart(
+    url = auth_data['config']["data"]["openimis_url"]+getPortPart(
         auth_data['config']["data"]["openimis_port"])+"/api/api_fhir_r4/Medication"
 
     # url = configurations["data"]["openimis_url"]+":" + \
