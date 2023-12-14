@@ -107,6 +107,28 @@ def getPractitioner(request):
             datac = json.loads(response.text)
             return Response(datac)
 
+        elif request.method == 'PUT':
+            resource_id = request.data['id']
+
+            if not resource_id:
+                raise Exception("No resource Id")
+            url = url + f"/{resource_id}/"
+
+            querystring = {"": ""}
+            data = json.dumps(request.data)
+            payload = data
+            headers = {
+                'Content-Type': "application/json",
+                'Authorization': auth_data['auth']
+            }
+            response = requests.request(
+                "PUT", url, data=payload, headers=headers, params=querystring, verify=False)
+            print(response)
+            
+            datac = json.loads(response.text)
+            
+            return Response(datac)
+
     except Exception as e:
         print('%s' % type(e))
 
