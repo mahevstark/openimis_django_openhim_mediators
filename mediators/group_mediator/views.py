@@ -43,7 +43,7 @@ from helpers.helpers import requests, initAuth, submitPaginatedResourcesToChanne
 # Suppress only the single warning from urllib3 needed.
 # requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'PUT'])
 def getGroup(request):
     try:
         print(" Executing getGroup ........")
