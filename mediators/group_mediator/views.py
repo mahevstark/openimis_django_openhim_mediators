@@ -33,7 +33,7 @@ from overview.views import configview
 import http.client
 import base64
 
-from helpers.helpers import requests, submitPaginatedResourcesToChannelCallback, getPortPart, getPaginatedRecords, fetchUniqueResource
+from helpers.helpers import requests, initAuth, submitPaginatedResourcesToChannelCallback, getPortPart, getPaginatedRecords, fetchUniqueResource
 
 
 # Add this temprarily for testing purposes
@@ -54,20 +54,26 @@ def getGroup(request):
         print("page_offset")
         print(page_offset)
 
-        result = configview()
-        configurations = result.__dict__
-        # username:password-openhimclient:openhimclientPasskey
-        authvars = configurations["data"]["openimis_user"] + \
-            ":"+configurations["data"]["openimis_passkey"]
-        # Standard Base64 Encoding
-        encodedBytes = base64.b64encode(authvars.encode("utf-8"))
-        encodedStr = str(encodedBytes, "utf-8")
-        auth_openimis = "Basic " + encodedStr
+        # result = configview()
+        # configurations = result.__dict__
+        # # username:password-openhimclient:openhimclientPasskey
+        # authvars = configurations["data"]["openimis_user"] + \
+        #     ":"+configurations["data"]["openimis_passkey"]
+        # # Standard Base64 Encoding
+        # encodedBytes = base64.b64encode(authvars.encode("utf-8"))
+        # encodedStr = str(encodedBytes, "utf-8")
+        # auth_openimis = "Basic " + encodedStr
 
-        # Standard Base64 Encoding
-        url = configurations["data"]["openimis_url"]+getPortPart(
-            configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Group"
+        # # Standard Base64 Encoding
+        # url = configurations["data"]["openimis_url"]+getPortPart(
+        #     configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Group"
 
+        auth_data = initAuth()
+
+        url = auth_data['config']["data"]["openimis_url"]+getPortPart(
+        auth_data['config']["data"]["openimis_port"])+"/api/api_fhir_r4/Group"
+
+    
         # retur`n url
 
         if page_offset != "":
@@ -94,53 +100,49 @@ def getGroup(request):
             # return response.json()
         elif request.method == 'POST':
             
-            reqBody = request.data
-            
-            resource_type = reqBody["resourceType"]
-            
-            resource_id = reqBody["id"]
-            
-            resource = fetchUniqueResource(resource_type, resource_id)
-            
-            headers = {
-                'Content-Type': "application/json",
-                'Authorization': auth_openimis
-            }
-            
-            querystring = {"": ""}
-            
-            payload = json.dumps(reqBody)
-
-            if (resource and resource["resourceType"] == resource_type):
-                
-                print("Update Group resource")
-
-                # Update Resource
-                
-                put_url = configurations["data"]["openimis_url"]+getPortPart(
-                configurations["data"]["openimis_port"])+"/api/api_fhir_r4/Group/"+str(resource_id)+"/"
-                
-                print(put_url)
-                
-                response = requests.request(
-                "PUT", put_url, data=payload, headers=headers, params=querystring, verify=False)
-                
-                datac = json.loads(response.text)
-                
-                # @Todo: Handle error message properly latter
-                
-                return Response(datac)
-            
             url = url + "/"
+        
             print("Create Group resource")
-
+            
             querystring = {"": ""}
             data = json.dumps(request.data)
             payload = data
-           
+            headers = {
+                'Content-Type': "application/json",
+                'Authorization': auth_data['auth']
+            }
             response = requests.request(
                 "POST", url, data=payload, headers=headers, params=querystring, verify=False)
             datac = json.loads(response.text)
+        
+            return Response(datac)
+            
+        elif request.method == 'PUT':
+        
+            resource_id = request.data['id']
+            
+            if not resource_id:
+                raise Exception("No resource Id Found")
+
+            url = url + f"/{resource_id}/"
+            
+            print(url)
+            
+            print("Update Group resource")
+            
+            querystring = {"": ""}
+            data = json.dumps(request.data)
+            payload = data
+            headers = {
+                'Content-Type': "application/json",
+                'Authorization': auth_data['auth']
+            }
+            response = requests.request(
+                "PUT", url, data=payload, headers=headers, params=querystring, verify=False)
+            print(response)
+            
+            datac = json.loads(response.text)
+        
             return Response(datac)
 
     except Exception as e:
